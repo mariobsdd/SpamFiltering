@@ -75,7 +75,7 @@ print "************************"
 #CROSS VALIDATION
 cross,cv_tipo,contSpam = classifier.sortData(cross,cv_tipo)
     
-k = 1
+k = 2
 
 contHam = fabs(len(cross)-contSpam)
 probSpam = float(contSpam + k)/float(len(cross) + (k*2))
@@ -129,6 +129,8 @@ print "************************"
 #Para K = 0.9, 1.1,1.2, me dio a misma K que con K =1
 #CON TESTING:::
 #PARA K = 1.5,  0.987455197133
+#PARA K = 1,    0.982078853047
+#PARA K = 3, K=2,    0.985663082437
 #"""
 #*******************************************************************************
 #TESTING SAMPLE FROM INPUT.TXT
