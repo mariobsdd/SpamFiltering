@@ -20,7 +20,7 @@ cv_tipo, cross = classifier.sanitizar(classifier.cleanInput,classifier.quitarEsp
 test_tipo, test = classifier.sanitizar(classifier.cleanInput,classifier.quitarEspacios,test)
 print "Data Sanitizada!"
 
-
+"""
 #TRAINING DATA
 train,train_tipo,contSpam = classifier.sortData(train,train_tipo)
     
@@ -71,12 +71,24 @@ print "RealHAM\t\t"+str(FPham)+"\t\t\t\t"+str(Pham)
 exito = float(Pspam+Pham)/float(Rham + Rspam)
 print "Porcentaje de Exito: ",exito
 print "************************"
-
+"""
 #CROSS VALIDATION
 cross,cv_tipo,contSpam = classifier.sortData(cross,cv_tipo)
     
-k = 2
-
+k = 1.5
+#k = 0.5
+#while (k<= 3.0):
+#    contHam = fabs(len(cross)-contSpam)
+#    probSpam = float(contSpam + k)/float(len(cross) + (k*2))
+#    probHam = float(contHam + k)/float(len(cross) + (k*2))
+#    print probSpam,probHam
+#    
+#    clasificador = classifier.setClasificador(cross,cv_tipo,contHam,contSpam, k)
+#    
+#    probabilidades = classifier.outputBayes(cross,probSpam,probHam)
+#
+#    k +=0.5
+    
 contHam = fabs(len(cross)-contSpam)
 probSpam = float(contSpam + k)/float(len(cross) + (k*2))
 probHam = float(contHam + k)/float(len(cross) + (k*2))
@@ -139,10 +151,10 @@ testing = []
 for line in archivo:
     testing.append(line)
 archivo.close()
-#CROSS VALIDATION
+#TEST VALIDATION
 test,test_tipo,contSpam = classifier.sortData(test,test_tipo)
     
-k = 2
+#k = 1.5
 
 contHam = fabs(len(test)-contSpam)
 probSpam = float(contSpam + k)/float(len(test) + (k*2))
@@ -163,28 +175,58 @@ FPham = 0
 FPspam = 0
 for i in range(0,len(probabilidades)):
     archivo.write(probabilidades[i].split(" ")[0]+"\t"+testing[i]+"\n")
-#    if(test_tipo[i] == 'spam'):
-#        Rspam +=1
-#    elif(test_tipo[i] == 'ham'):
-#        Rham +=1
-#    if((probabilidades[i].split(" ")[0] == test_tipo[i]) and (test_tipo[i] == 'spam')):
-#        Pspam +=1
-#    elif((probabilidades[i].split(" ")[0] == test_tipo[i]) and (test_tipo[i] == 'ham')):
-#        Pham +=1
-#    if((probabilidades[i].split(" ")[0] != test_tipo[i]) and (test_tipo[i] == 'spam')):
-#        #todos los que yo dije que eran ham y eran SPAM
-#        FPspam +=1
-#    elif((probabilidades[i].split(" ")[0] != test_tipo[i]) and (test_tipo[i] == 'ham')):
-#        #todos los que yo dije que eran SPAM y eran HAM
-#        FPham +=1
 
 archivo.close()
-#print "TESTING DATA"
-#print "%Exito Spam: ",float(Pspam)/float(Rspam)
-#print "%Exito Ham: ",float(Pham)/float(Rham)
-#print "******Confussion Matrix - CROSS VALIDATION Data******"
-#print "\t\tPredictedSPAM\t\tPredictedHAM"
-#print "RealSPAM\t"+str(Pspam)+"\t\t\t\t"+str(FPspam)
-#print "RealHAM\t\t"+str(FPham)+"\t\t\t\t"+str(Pham)
-#exito = float(Pspam+Pham)/float(Rham + Rspam)
-#print "Porcentaje de Exito: "+str(exito)
+print "output done!"
+#****************************************************************************************
+#ONLY TEST DATA
+#CROSS VALIDATION
+test,test_tipo,contSpam = classifier.sortData(test,test_tipo)
+    
+#k = 1.5
+
+contHam = fabs(len(test)-contSpam)
+probSpam = float(contSpam + k)/float(len(test) + (k*2))
+probHam = float(contHam + k)/float(len(test) + (k*2))
+print probSpam,probHam
+
+clasificador = classifier.setClasificador(test,test_tipo,contHam,contSpam, k)
+
+probabilidades = classifier.outputBayes(test,probSpam,probHam)
+#print probabilidades
+
+archivo = open("outputTest.txt",'w')
+Rspam = 0
+Rham = 0
+Pspam = 0
+Pham = 0
+FPham = 0
+FPspam = 0
+for i in range(0,len(probabilidades)):
+    archivo.write(test_tipo[i]+"\t"+probabilidades[i]+"\n")
+    if(test_tipo[i] == 'spam'):
+        Rspam +=1
+    elif(test_tipo[i] == 'ham'):
+        Rham +=1
+    if((probabilidades[i].split(" ")[0] == test_tipo[i]) and (test_tipo[i] == 'spam')):
+        Pspam +=1
+    elif((probabilidades[i].split(" ")[0] == test_tipo[i]) and (test_tipo[i] == 'ham')):
+        Pham +=1
+    if((probabilidades[i].split(" ")[0] != test_tipo[i]) and (test_tipo[i] == 'spam')):
+        #todos los que yo dije que eran ham y eran SPAM
+        FPspam +=1
+    elif((probabilidades[i].split(" ")[0] != test_tipo[i]) and (test_tipo[i] == 'ham')):
+        #todos los que yo dije que eran SPAM y eran HAM
+        FPham +=1
+
+archivo.close()
+print "TEST DATA"
+print "%Exito Spam: ",float(Pspam)/float(Rspam)
+print "%Exito Ham: ",float(Pham)/float(Rham)
+print "******Confussion Matrix - TEST Data******"
+print "\t\tPredictedSPAM\t\tPredictedHAM"
+print "RealSPAM\t"+str(Pspam)+"\t\t\t\t"+str(FPspam)
+print "RealHAM\t\t"+str(FPham)+"\t\t\t\t"+str(Pham)
+exito = float(Pspam+Pham)/float(Rham + Rspam)
+print "Porcentaje de Exito: "+str(exito)
+print "************************"
